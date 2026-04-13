@@ -4,3 +4,4 @@ uv sync
 source .venv/bin/activate
 git init: You want to commit your pyproject.toml and uv.lock right away so your project "DNA" is saved
 
+# ml-hotelbooking
