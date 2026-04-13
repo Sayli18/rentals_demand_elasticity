@@ -1,0 +1,49 @@
+data_paths:
+
+
+preprocessing:
+
+feature_engineering:
+
+
+training:
+  random_state: 42
+
+  cv_folds:
+
+
+  holdout:
+    train_months: 
+    val_month: 
+
+  lgbm_params:
+    n_estimators: 
+    learning_rate:
+    num_leaves: 
+  xgb_params:
+    n_estimators: 
+    learning_rate:
+    max_depth: 
+
+  regression_targets:
+
+
+  classification_target: 
+
+  tree_features:
+
+
+evaluation:
+  output_dir: "output"
+  model_dir: "models"
+  plot_dpi: 120
+  n_top_features: 10
+
+tuning:
+  enabled: true        # set to true to run Optuna before final training
+  n_trials: 20
+  regression_tune_target: log_income   # reference target used for regression tuning (inc is the most complicated target so tune)
+
+  lgbm_search_space:
+
+  xgb_search_space:
