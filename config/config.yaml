@@ -1,49 +1,62 @@
 data_paths:
+  processed:        "data/processed"        # train/val/test parquets land here
+  synthetic_events: "data/synthetic/synthetic_demand_events.parquet"
+  train:            "data/processed/train.parquet"
+  val:              "data/processed/val.parquet"
+  test:             "data/processed/test.parquet"
 
-
-preprocessing:
-
-feature_engineering:
-
+data_split:
+  # Time-based split on stay_date. Train end is inclusive; val/test boundaries
+  # follow as: val = (train_end, val_end], test = (val_end, ...].
+  # Val ends "today" (2026-04-29) — realistic deployment posture; test = forecast horizon.
+  train_end: "2025-04-30"
+  val_end:   "2026-04-29"
 
 training:
   random_state: 42
 
-  cv_folds:
-
-
-  holdout:
-    train_months: 
-    val_month: 
-
+  # LightGBM defaults — used by booking + cancellation classifiers
   lgbm_params:
-    n_estimators: 
-    learning_rate:
-    num_leaves: 
+    n_estimators: 500
+    learning_rate: 0.05
+    num_leaves: 63
+
+  # XGBoost defaults — used by booking + cancellation classifiers
   xgb_params:
-    n_estimators: 
-    learning_rate:
-    max_depth: 
+    n_estimators: 500
+    learning_rate: 0.05
+    max_depth: 7
 
-  regression_targets:
-
-
-  classification_target: 
-
-  tree_features:
-
+models:
+  # Where joblib artefacts get written by the orchestrators
+  booking_dir:      "models/booking"        # logreg.joblib / lightgbm.joblib / xgboost.joblib
+  cancellation_dir: "models/cancellation"   # same layout, fitted on booked subset
 
 evaluation:
-  output_dir: "output"
-  model_dir: "models"
+  output_dir: "output"      # eval reports, reliability plots, regret memos
   plot_dpi: 120
-  n_top_features: 10
 
 tuning:
-  enabled: true        # set to true to run Optuna before final training
-  n_trials: 20
-  regression_tune_target: log_income   # reference target used for regression tuning (inc is the most complicated target so tune)
+  # Optuna search spaces — wire up in Phase 3 follow-up; defaults above run first
+  enabled: false
+  n_trials: 30
 
   lgbm_search_space:
+    n_estimators:     [100, 1000]
+    learning_rate:    [0.01, 0.3]
+    num_leaves:       [15, 127]
+    min_child_samples: [5, 100]
+    subsample:        [0.5, 1.0]
+    colsample_bytree: [0.5, 1.0]
+    reg_alpha:        [0.0, 10.0]
+    reg_lambda:       [0.0, 10.0]
 
   xgb_search_space:
+    n_estimators:     [100, 1000]
+    learning_rate:    [0.01, 0.3]
+    max_depth:        [3, 10]
+    min_child_weight: [1, 50]
+    subsample:        [0.5, 1.0]
+    colsample_bytree: [0.5, 1.0]
+    reg_alpha:        [0.0, 10.0]
+    reg_lambda:       [0.0, 10.0]
